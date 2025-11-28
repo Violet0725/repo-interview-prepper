@@ -27,14 +27,18 @@ import {
   FileCode, 
   GraduationCap, 
   Sun, 
-  Moon
+  Moon,
+  Settings,
+  Key
 } from 'lucide-react';
 
 const RepoInterviewTool = () => {
   // --- State: Configuration ---
   const [theme, setTheme] = useState('light'); 
+  const [apiKey, setApiKey] = useState(''); // Restored for local testing
   const [resumeText, setResumeText] = useState('');
   const [showContextInput, setShowContextInput] = useState(false);
+  const [showSettings, setShowSettings] = useState(false); // New settings toggle
   const [questionType, setQuestionType] = useState('mixed'); 
 
   // --- State: Workflow ---
@@ -55,7 +59,15 @@ const RepoInterviewTool = () => {
   useEffect(() => {
     const savedSearches = JSON.parse(localStorage.getItem('recent_searches') || '[]');
     setRecentSearches(savedSearches);
+    
+    // Persist key for convenience in preview
+    const savedKey = localStorage.getItem('openai_api_key_local');
+    if (savedKey) setApiKey(savedKey);
   }, []);
+
+  useEffect(() => {
+    if (apiKey) localStorage.setItem('openai_api_key_local', apiKey);
+  }, [apiKey]);
 
   // --- Helpers ---
   const isDark = theme === 'dark';
@@ -104,12 +116,10 @@ const RepoInterviewTool = () => {
   // --- API Interactions ---
 
   const fetchRepoStructure = async (urlOverride) => {
-    // Determine which URL to use: the argument (if passed from recent clicks) or the state
     const targetUrl = typeof urlOverride === 'string' ? urlOverride : repoUrl;
 
     if (!targetUrl) return;
 
-    // Update visual state if we are running from a direct argument
     if (typeof urlOverride === 'string') {
         setRepoUrl(urlOverride);
     }
@@ -158,7 +168,7 @@ const RepoInterviewTool = () => {
       setFileTree(interestingFiles);
       setRepoData({ owner: repoInfo.owner, repo: repoInfo.repo });
       setStep('file-select');
-      addToHistory(targetUrl); 
+      addToHistory(targetUrl);
 
     } catch (err) {
       setError(err.message);
@@ -259,12 +269,21 @@ const RepoInterviewTool = () => {
         messages: [
           { role: "system", content: "You output only valid JSON." },
           { role: "user", content: prompt }
-        ]
+        ],
+        // FORCE JSON MODE FOR QUESTIONS to make it fast
+        response_format: { type: "json_object" }
       })
     });
 
     if (!response.ok) {
-        throw new Error("Failed to generate questions. Ensure your API Key is set in the deployment environment variables.");
+        let errorMsg = "Unknown Error";
+        try {
+            const errData = await response.json();
+            errorMsg = errData.error || response.statusText;
+        } catch (e) {
+            errorMsg = `Server Error: ${response.status}`;
+        }
+        throw new Error(errorMsg);
     }
     
     const data = await response.json();
@@ -331,7 +350,7 @@ ${interviewData.questions.map((q, i) => `
       setEvaluating(true);
 
       try {
-        // Calls local backend
+        // Calls local backend - NO JSON MODE FOR CHAT so AI can talk freely
         const response = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -530,6 +549,18 @@ ${interviewData.questions.map((q, i) => `
              >
                <User className="w-3 h-3" /> Context
              </button>
+
+             {/* Settings Toggle */}
+             <button 
+                onClick={() => setShowSettings(!showSettings)}
+                className={`flex items-center justify-center w-10 h-10 rounded-full border transition-all backdrop-blur-md active:scale-95 ${
+                  showSettings
+                    ? (isDark ? 'bg-slate-800 border-cyan-500/50 text-cyan-400' : 'bg-white border-cyan-300 text-cyan-600') 
+                    : (isDark ? 'bg-slate-900/60 border-slate-800 text-slate-400 hover:border-slate-600' : 'bg-white/60 border-white/50 text-slate-500 hover:border-slate-300 shadow-sm')
+                }`}
+             >
+               <Settings className="w-4 h-4" />
+             </button>
              
              {/* Theme Toggle */}
              <button
@@ -548,6 +579,31 @@ ${interviewData.questions.map((q, i) => `
         {/* Collapsible Panels */}
         <div className="space-y-4 mb-8">
           
+          {/* Settings / API Key Panel */}
+          {showSettings && (
+            <div className={`backdrop-blur-xl border rounded-xl p-6 shadow-2xl animate-in slide-in-from-top-2 ${isDark ? 'bg-slate-900/60 border-cyan-900/30' : 'bg-white/60 border-cyan-100/50'}`}>
+              <div className="flex items-center gap-2 mb-3">
+                 <Key className="w-4 h-4 text-cyan-500" />
+                 <span className={`text-sm font-bold ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>API Configuration</span>
+              </div>
+              <p className={`text-xs mb-3 ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
+                Enter your API key below for local testing. In production, this can be hidden on the backend.
+              </p>
+              <div className="flex gap-2">
+                <input
+                  type="password"
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  placeholder="sk-..."
+                  className={`flex-1 border rounded-lg px-4 py-2 text-sm focus:border-cyan-500 outline-none transition-all backdrop-blur-sm ${isDark ? 'bg-slate-950/50 border-slate-700 text-white' : 'bg-white/50 border-slate-200 text-slate-700 focus:bg-white/80'}`}
+                />
+                <a href="https://platform.openai.com/api-keys" target="_blank" rel="noreferrer" className={`px-4 py-2 rounded-lg text-sm font-medium border flex items-center ${isDark ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-white' : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700'}`}>
+                    Get Key
+                </a>
+              </div>
+            </div>
+          )}
+
           {showContextInput && (
             <div className={`backdrop-blur-xl border rounded-xl p-6 shadow-2xl animate-in slide-in-from-top-2 ${isDark ? 'bg-slate-900/60 border-purple-900/30' : 'bg-white/60 border-purple-100/50'}`}>
               <div className="flex items-center gap-2 mb-3">
@@ -700,14 +756,15 @@ ${interviewData.questions.map((q, i) => `
                       </div>
                    )}
                 </div>
-                  
-                  {error && (
-                    <div className={`mx-6 mt-4 p-3 border rounded-lg text-xs flex items-center gap-2 ${isDark ? 'bg-red-950/30 border-red-900/50 text-red-400' : 'bg-red-50 border-red-200 text-red-600'}`}>
-                      <AlertCircle className="w-4 h-4" /> 
-                      <span>{error}</span>
-                    </div>
-                  )}
-
+                
+                {/* Error Banner */}
+                {error && (
+                  <div className={`mx-6 mt-4 p-3 border rounded-lg text-xs flex items-center gap-2 ${isDark ? 'bg-red-950/30 border-red-900/50 text-red-400' : 'bg-red-50 border-red-200 text-red-600'}`}>
+                    <AlertCircle className="w-4 h-4" /> 
+                    <span>{error}</span>
+                  </div>
+                )}
+                
                 {/* Mode Selection Toolbar */}
                 <div className={`px-6 py-4 border-t flex flex-col md:flex-row gap-4 justify-between items-center ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white/50 border-slate-100'}`}>
                    
