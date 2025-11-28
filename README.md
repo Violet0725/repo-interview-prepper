@@ -2,6 +2,10 @@
 
 Repo Interview Prepper is an AI-powered web application designed to help developers prepare for technical interviews. By analyzing a specific GitHub repository, the tool generates tailored interview questions—ranging from architectural decisions to specific code implementations—simulating a real-world technical deep dive.
 
+## 🎬 Demo
+
+![Repo Interview Prepper Demo - Analyzing a GitHub repository](./demo.gif)
+
 ## 🚀 Features
 
 * **Repository Analysis**: Scans public GitHub repositories to extract file structure, README context, and key source code.
