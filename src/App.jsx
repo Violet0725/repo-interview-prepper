@@ -700,7 +700,14 @@ ${interviewData.questions.map((q, i) => `
                       </div>
                    )}
                 </div>
-                
+                  
+                  {error && (
+                    <div className={`mx-6 mt-4 p-3 border rounded-lg text-xs flex items-center gap-2 ${isDark ? 'bg-red-950/30 border-red-900/50 text-red-400' : 'bg-red-50 border-red-200 text-red-600'}`}>
+                      <AlertCircle className="w-4 h-4" /> 
+                      <span>{error}</span>
+                    </div>
+                  )}
+
                 {/* Mode Selection Toolbar */}
                 <div className={`px-6 py-4 border-t flex flex-col md:flex-row gap-4 justify-between items-center ${isDark ? 'bg-slate-900/50 border-slate-800' : 'bg-white/50 border-slate-100'}`}>
                    
