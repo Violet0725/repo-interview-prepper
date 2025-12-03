@@ -21,9 +21,10 @@ Try it out: **[repo-interview-prepper.vercel.app](https://repo-interview-prepper
 
 ## 🛠️ Tech Stack
 
-* **Frontend**: React.js, Vite, Tailwind CSS, Lucide React
-* **Backend**: Node.js (Vercel Serverless Functions)
-* **AI Integration**: OpenAI API (`gpt-4o-mini`)
+* **Frontend**: React 19, Vite, Tailwind CSS, Lucide React
+* **Backend**: Node.js (Vercel Serverless Functions with Edge Runtime)
+* **AI Integration**: OpenAI API (`gpt-4o-mini`) with SSE streaming
+* **Testing**: Vitest, React Testing Library, jsdom
 * **Deployment**: Vercel
 
 ## 📂 Project Structure
@@ -31,14 +32,66 @@ Try it out: **[repo-interview-prepper.vercel.app](https://repo-interview-prepper
 ```
 repo-interview-prepper/
 ├── api/
-│   └── chat.js          # Serverless backend proxy (Securely calls OpenAI)
+│   ├── chat.js          # Serverless backend proxy (Securely calls OpenAI)
+│   └── chat-stream.js   # Streaming API endpoint (SSE for real-time responses)
 ├── public/              # Static assets (favicon, etc.)
 ├── src/
-│   ├── App.jsx          # Main React Application Logic
+│   ├── components/      # Modular UI components
+│   │   ├── Navbar.jsx
+│   │   ├── RepoInput.jsx
+│   │   ├── FileSelector.jsx
+│   │   ├── QuestionCard.jsx
+│   │   ├── MockChat.jsx       # Streaming chat component
+│   │   ├── ResultsDashboard.jsx
+│   │   ├── ContextPanel.jsx
+│   │   └── ui/
+│   │       └── SkeletonLoader.jsx
+│   ├── hooks/           # Custom React hooks
+│   │   ├── useTheme.js
+│   │   ├── useGitHub.js
+│   │   └── useRecentSearches.js
+│   ├── services/        # API service layer
+│   │   ├── github.js    # GitHub API interactions
+│   │   └── ai.js        # OpenAI API with streaming support
+│   ├── utils/
+│   │   └── markdown.jsx # Markdown rendering utilities
+│   ├── test/
+│   │   └── setup.js     # Vitest test configuration
+│   ├── App.jsx          # Main orchestration component
 │   ├── main.jsx         # Entry point
 │   └── index.css        # Global styles & Tailwind directives
-└── ...config files      # Tailwind, PostCSS, Vite configs
+└── vitest.config.js     # Testing configuration
 ```
+
+## 🧪 Testing
+
+The project includes a comprehensive test suite using Vitest and React Testing Library:
+
+```bash
+# Run tests in watch mode
+npm test
+
+# Run tests once
+npm run test:run
+
+# Run tests with coverage report
+npm run test:coverage
+
+# Run tests with UI
+npm run test:ui
+```
+
+**Test Coverage:**
+- Unit tests for services (GitHub API, AI service)
+- Hook tests (useTheme, useRecentSearches)
+- Component tests (QuestionCard, RepoInput, markdown utilities)
+
+## ⚡ Real-time Streaming
+
+The Mock Interview Mode features **real-time streaming responses** using Server-Sent Events (SSE):
+- Token-by-token AI feedback display
+- Visual streaming indicator
+- Abort capability for long responses
 
 ## 🛡️ Architecture & Security
 
