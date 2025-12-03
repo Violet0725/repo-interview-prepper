@@ -2,3 +2,4 @@
 export { useTheme } from './useTheme';
 export { useRecentSearches } from './useRecentSearches';
 export { useGitHub } from './useGitHub';
+export { useKeyboardShortcuts, SHORTCUTS } from './useKeyboardShortcuts';

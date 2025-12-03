@@ -18,6 +18,11 @@ Try it out: **[repo-interview-prepper.vercel.app](https://repo-interview-prepper
 * **Mock Interview Simulation**: Interactive chat mode to practice answers with AI feedback.
 * **Secure Architecture**: Uses a Vercel Serverless Function to proxy API calls, keeping your OpenAI API key hidden from the client-side.
 * **Modern UI**: Fully responsive design with Dark/Light mode, glassmorphism effects, and Tailwind CSS.
+* **Export Options**: Download interview guides as Markdown, PDF, or JSON.
+* **Keyboard Shortcuts**: Navigate quickly with `Ctrl+K` (focus search), `Ctrl+Shift+L` (toggle theme), `?` (help).
+* **Progress Tracking**: Visual step indicator showing your progress through the workflow.
+* **Toast Notifications**: Real-time feedback for actions and errors.
+* **Rate Limiting**: API protection with 20 requests/minute per IP.
 
 ## 🛠️ Tech Stack
 
@@ -45,22 +50,30 @@ repo-interview-prepper/
 │   │   ├── ResultsDashboard.jsx
 │   │   ├── ContextPanel.jsx
 │   │   └── ui/
-│   │       └── SkeletonLoader.jsx
+│   │       ├── SkeletonLoader.jsx
+│   │       ├── Toast.jsx          # Toast notification system
+│   │       ├── ProgressSteps.jsx  # Step progress indicator
+│   │       └── KeyboardShortcutsHelp.jsx
 │   ├── hooks/           # Custom React hooks
 │   │   ├── useTheme.js
 │   │   ├── useGitHub.js
-│   │   └── useRecentSearches.js
+│   │   ├── useRecentSearches.js
+│   │   └── useKeyboardShortcuts.js
 │   ├── services/        # API service layer
 │   │   ├── github.js    # GitHub API interactions
 │   │   └── ai.js        # OpenAI API with streaming support
 │   ├── utils/
-│   │   └── markdown.jsx # Markdown rendering utilities
+│   │   ├── markdown.jsx  # Markdown rendering utilities
+│   │   └── exportPdf.js  # PDF/JSON export utilities
 │   ├── test/
 │   │   └── setup.js     # Vitest test configuration
 │   ├── App.jsx          # Main orchestration component
 │   ├── main.jsx         # Entry point
 │   └── index.css        # Global styles & Tailwind directives
-└── vitest.config.js     # Testing configuration
+├── vitest.config.js     # Testing configuration
+└── .github/
+    └── workflows/
+        └── ci.yml       # CI/CD pipeline (tests, lint, build)
 ```
 
 ## 🧪 Testing

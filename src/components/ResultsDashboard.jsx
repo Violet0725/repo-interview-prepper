@@ -1,12 +1,82 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   ChevronDown, 
   Download, 
   FileText, 
   Cpu, 
-  Zap 
+  Zap,
+  FileJson,
+  Printer
 } from 'lucide-react';
 import QuestionCard from './QuestionCard';
+
+/**
+ * Export dropdown component
+ */
+const ExportDropdown = ({ onDownload, isDark }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const exportOptions = [
+    { id: 'md', label: 'Markdown (.md)', icon: FileText },
+    { id: 'pdf', label: 'PDF (Print)', icon: Printer },
+    { id: 'json', label: 'JSON Data', icon: FileJson },
+  ];
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`flex items-center gap-2 px-4 py-2 border rounded-lg text-sm transition-colors backdrop-blur-md active:scale-95 ${
+          isDark
+            ? 'bg-slate-800/80 hover:bg-slate-700 border-slate-700 text-slate-300'
+            : 'bg-white/60 hover:bg-white/80 border-slate-200 text-slate-600 shadow-sm'
+        }`}
+        aria-expanded={isOpen}
+        aria-haspopup="true"
+      >
+        <Download className="w-4 h-4" /> Export
+        <ChevronDown className={`w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+
+      {isOpen && (
+        <>
+          <div 
+            className="fixed inset-0 z-10" 
+            onClick={() => setIsOpen(false)}
+            aria-hidden="true"
+          />
+          <div
+            className={`absolute right-0 mt-2 w-48 rounded-lg border shadow-xl z-20 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 ${
+              isDark
+                ? 'bg-slate-800 border-slate-700'
+                : 'bg-white border-slate-200'
+            }`}
+            role="menu"
+          >
+            {exportOptions.map((option) => (
+              <button
+                key={option.id}
+                onClick={() => {
+                  onDownload(option.id);
+                  setIsOpen(false);
+                }}
+                className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors ${
+                  isDark
+                    ? 'text-slate-300 hover:bg-slate-700'
+                    : 'text-slate-600 hover:bg-slate-50'
+                }`}
+                role="menuitem"
+              >
+                <option.icon className="w-4 h-4" />
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
 
 /**
  * Results dashboard showing generated interview content
@@ -33,16 +103,7 @@ export const ResultsDashboard = ({
         >
           <ChevronDown className="w-4 h-4 rotate-90" /> Back to Files
         </button>
-        <button
-          onClick={onDownload}
-          className={`flex items-center gap-2 px-4 py-2 border rounded-lg text-sm transition-colors backdrop-blur-md active:scale-95 ${
-            isDark
-              ? 'bg-slate-800/80 hover:bg-slate-700 border-slate-700 text-slate-300'
-              : 'bg-white/60 hover:bg-white/80 border-slate-200 text-slate-600 shadow-sm'
-          }`}
-        >
-          <Download className="w-4 h-4" /> Download Brief
-        </button>
+<ExportDropdown onDownload={onDownload} isDark={isDark} />
       </div>
 
       {/* Summary Cards */}

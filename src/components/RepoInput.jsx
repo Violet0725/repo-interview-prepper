@@ -19,7 +19,8 @@ export const RepoInput = ({
   error, 
   recentSearches, 
   onScan, 
-  isDark 
+  isDark,
+  inputRef 
 }) => {
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
@@ -92,10 +93,12 @@ export const RepoInput = ({
               isDark ? 'text-slate-500' : 'text-slate-400'
             }`} />
             <input
+              ref={inputRef}
               type="text"
               value={repoUrl}
               onChange={(e) => setRepoUrl(e.target.value)}
               placeholder="github.com/username/repository"
+              aria-label="GitHub repository URL"
               className={`w-full h-14 pl-12 pr-4 bg-transparent rounded-lg placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-cyan-500/20 transition-all font-mono ${
                 isDark ? 'text-slate-200' : 'text-slate-700'
               }`}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { Analytics } from "@vercel/analytics/react";
 
 // Components
@@ -10,20 +10,31 @@ import {
   ResultsDashboard, 
   SkeletonLoader 
 } from './components';
+import { ToastProvider, useToast } from './components/ui/Toast';
+import { ProgressSteps } from './components/ui/ProgressSteps';
+import { KeyboardShortcutsHelp } from './components/ui/KeyboardShortcutsHelp';
 
 // Hooks
 import { useTheme, useRecentSearches, useGitHub } from './hooks';
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 
 // Services
 import { generateQuestions } from './services/ai';
+
+// Utils
+import { exportToPdf, exportToJson } from './utils/exportPdf';
 
 /**
  * Main Application Component
  * Orchestrates the interview preparation workflow
  */
-const RepoInterviewTool = () => {
+// Inner component that uses toast context
+const RepoInterviewToolInner = () => {
   // Theme
   const { isDark, toggleTheme } = useTheme('light');
+  
+  // Toast notifications
+  const toast = useToast();
   
   // Recent searches
   const { recentSearches, addToHistory } = useRecentSearches();
@@ -50,9 +61,22 @@ const RepoInterviewTool = () => {
   const [loading, setLoading] = useState(false);
   const [loadingText, setLoadingText] = useState('');
   const [error, setError] = useState(null);
+  
+  // Refs for keyboard shortcuts
+  const searchInputRef = useRef(null);
 
   // Combined loading state
   const isLoading = loading || githubLoading;
+  
+  // Keyboard shortcuts
+  useKeyboardShortcuts({
+    'mod+shift+l': toggleTheme,
+    'mod+k': () => searchInputRef.current?.focus(),
+    'escape': () => {
+      if (step === 'file-select') setStep('input');
+      if (step === 'results') setStep('file-select');
+    },
+  });
 
   /**
    * Handle repository scan
@@ -72,6 +96,9 @@ const RepoInterviewTool = () => {
       setStep('file-select');
       setSelectedFiles([]);
       addToHistory(targetUrl);
+      toast.success(`Found ${fileTree?.length || 0} files to analyze`);
+    } else {
+      toast.error(githubError || 'Failed to scan repository');
     }
   };
 
@@ -100,21 +127,31 @@ const RepoInterviewTool = () => {
       
       setInterviewData(questions);
       setStep('results');
+      toast.success('Interview questions generated!');
     } catch (err) {
       setError(err.message);
       setStep('file-select');
+      toast.error(err.message || 'Failed to generate questions');
     } finally {
       setLoading(false);
     }
   };
 
   /**
-   * Download interview guide as markdown
+   * Download interview guide in various formats
    */
-  const handleDownload = () => {
+  const handleDownload = (format = 'md') => {
     if (!interviewData || !repoData) return;
     
-    const content = `
+    try {
+      if (format === 'pdf') {
+        exportToPdf(interviewData, repoData);
+        toast.success('PDF export opened in new window');
+      } else if (format === 'json') {
+        exportToJson(interviewData, repoData);
+        toast.success('JSON file downloaded');
+      } else {
+        const content = `
 # Interview Prep Guide: ${repoData.repo}
 
 ## Project Summary
@@ -129,15 +166,20 @@ ${interviewData.questions?.map((q, i) => `
 **Strategy:** ${q.strategy}
 **Sample Answer:** ${q.sample_answer}
 `).join('\n')}
-    `;
-    
-    const blob = new Blob([content], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${repoData.repo}_interview_prep.md`;
-    a.click();
-    URL.revokeObjectURL(url);
+        `;
+        
+        const blob = new Blob([content], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${repoData.repo}_interview_prep.md`;
+        a.click();
+        URL.revokeObjectURL(url);
+        toast.success('Markdown file downloaded');
+      }
+    } catch (err) {
+      toast.error(err.message || 'Export failed');
+    }
   };
 
   return (
@@ -175,6 +217,9 @@ ${interviewData.questions?.map((q, i) => `
             toggleTheme={toggleTheme}
           />
 
+          {/* Progress Steps */}
+          <ProgressSteps currentStep={step} isDark={isDark} />
+
           {/* Context Panel */}
           {showContextInput && (
             <div className="space-y-4 mb-8">
@@ -196,6 +241,7 @@ ${interviewData.questions?.map((q, i) => `
               recentSearches={recentSearches}
               onScan={handleScanRepo}
               isDark={isDark}
+              inputRef={searchInputRef}
             />
           )}
 
@@ -241,10 +287,20 @@ ${interviewData.questions?.map((q, i) => `
               isDark={isDark}
             />
           )}
+
+          {/* Keyboard Shortcuts Help */}
+          <KeyboardShortcutsHelp isDark={isDark} />
         </div>
       </div>
     </>
   );
 };
+
+// Wrapper component with Toast Provider
+const RepoInterviewTool = () => (
+  <ToastProvider>
+    <RepoInterviewToolInner />
+  </ToastProvider>
+);
 
 export default RepoInterviewTool;
