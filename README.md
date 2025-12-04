@@ -54,11 +54,14 @@ repo-interview-prepper/
 │   │       ├── Toast.jsx          # Toast notification system
 │   │       ├── ProgressSteps.jsx  # Step progress indicator
 │   │       └── KeyboardShortcutsHelp.jsx
+│   ├── context/         # React contexts
+│   │   └── ToastContext.js
 │   ├── hooks/           # Custom React hooks
 │   │   ├── useTheme.js
 │   │   ├── useGitHub.js
 │   │   ├── useRecentSearches.js
-│   │   └── useKeyboardShortcuts.js
+│   │   ├── useKeyboardShortcuts.js
+│   │   └── useToast.js
 │   ├── services/        # API service layer
 │   │   ├── github.js    # GitHub API interactions
 │   │   └── ai.js        # OpenAI API with streaming support
