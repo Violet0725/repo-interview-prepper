@@ -83,6 +83,7 @@ const ExportDropdown = ({ onDownload, isDark }) => {
  */
 export const ResultsDashboard = ({
   interviewData,
+  // eslint-disable-next-line no-unused-vars
   repoData,
   questionType,
   onBack,

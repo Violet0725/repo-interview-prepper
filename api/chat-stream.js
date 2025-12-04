@@ -1,3 +1,4 @@
+/* global process */
 /**
  * Streaming Chat API Endpoint
  * Proxies requests to OpenAI with Server-Sent Events (SSE) for real-time streaming

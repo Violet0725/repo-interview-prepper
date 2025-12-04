@@ -16,13 +16,13 @@ const headers = {
  */
 export const parseRepoUrl = (url) => {
   try {
-    const regex = /github\.com\/([^\/]+)\/([^\/]+)/;
+    const regex = /github\.com\/([^/]+)\/([^/]+)/;
     const match = url.match(regex);
     if (match) {
       return { owner: match[1], repo: match[2].replace('.git', '') };
     }
     return null;
-  } catch (e) {
+  } catch {
     return null;
   }
 };
@@ -35,7 +35,7 @@ export const parseRepoUrl = (url) => {
 export const decodeContent = (base64) => {
   try {
     return decodeURIComponent(escape(window.atob(base64)));
-  } catch (e) {
+  } catch {
     return "Unable to decode file content.";
   }
 };
@@ -83,7 +83,7 @@ export const fetchReadme = async (owner, repo) => {
       return decodeContent(data.content);
     }
     return "";
-  } catch (e) {
+  } catch {
     console.warn("No README found");
     return "";
   }
@@ -106,7 +106,7 @@ export const fetchFileContent = async (owner, repo, path) => {
       return decodeContent(data.content);
     }
     return null;
-  } catch (e) {
+  } catch {
     console.warn(`Failed to read ${path}`);
     return null;
   }

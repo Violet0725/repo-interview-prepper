@@ -1,3 +1,4 @@
+/* global process */
 /**
  * Chat API Endpoint with Rate Limiting
  * Proxies requests to OpenAI API securely

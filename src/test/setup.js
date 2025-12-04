@@ -1,6 +1,9 @@
+/* eslint-env node */
+/* global global */
 import { expect, afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import * as matchers from '@testing-library/jest-dom/matchers';
+import { Buffer } from 'buffer';
 
 // Extend Vitest's expect with Testing Library matchers
 expect.extend(matchers);

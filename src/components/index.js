@@ -9,6 +9,6 @@ export { MockChat } from './MockChat';
 export { SkeletonLoader } from './ui/SkeletonLoader';
 
 // UI Components
-export { ToastProvider, useToast } from './ui/Toast';
+export { ToastProvider } from './ui/Toast';
 export { ProgressSteps } from './ui/ProgressSteps';
 export { KeyboardShortcutsHelp } from './ui/KeyboardShortcutsHelp';

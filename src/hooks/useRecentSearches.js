@@ -1,24 +1,25 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 
 const STORAGE_KEY = 'recent_searches';
 const MAX_SEARCHES = 5;
 
 /**
+ * Load recent searches from localStorage
+ */
+const loadFromStorage = () => {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  } catch {
+    return [];
+  }
+};
+
+/**
  * Custom hook for managing recent search history
  */
 export const useRecentSearches = () => {
-  const [recentSearches, setRecentSearches] = useState([]);
-
-  // Load from localStorage on mount
-  useEffect(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-      setRecentSearches(saved);
-    } catch (e) {
-      console.warn('Failed to load recent searches:', e);
-      setRecentSearches([]);
-    }
-  }, []);
+  // Use lazy initialization to load from localStorage
+  const [recentSearches, setRecentSearches] = useState(loadFromStorage);
 
   // Add a new search to history
   const addToHistory = useCallback((url) => {

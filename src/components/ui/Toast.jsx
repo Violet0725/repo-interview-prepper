@@ -1,8 +1,6 @@
-import React, { useState, useEffect, createContext, useContext, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
-
-// Toast Context
-const ToastContext = createContext(null);
+import { ToastContext } from '../../context/ToastContext';
 
 /**
  * Toast notification types and their styles
@@ -110,17 +108,6 @@ export const ToastProvider = ({ children }) => {
       <ToastContainer toasts={toasts} removeToast={removeToast} />
     </ToastContext.Provider>
   );
-};
-
-/**
- * Hook to use toast notifications
- */
-export const useToast = () => {
-  const context = useContext(ToastContext);
-  if (!context) {
-    throw new Error('useToast must be used within a ToastProvider');
-  }
-  return context;
 };
 
 export default ToastProvider;

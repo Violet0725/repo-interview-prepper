@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef } from 'react';
 import { Analytics } from "@vercel/analytics/react";
 
 // Components
@@ -10,7 +10,8 @@ import {
   ResultsDashboard, 
   SkeletonLoader 
 } from './components';
-import { ToastProvider, useToast } from './components/ui/Toast';
+import { ToastProvider } from './components/ui/Toast';
+import { useToast } from './hooks/useToast';
 import { ProgressSteps } from './components/ui/ProgressSteps';
 import { KeyboardShortcutsHelp } from './components/ui/KeyboardShortcutsHelp';
 
@@ -46,8 +47,7 @@ const RepoInterviewToolInner = () => {
     fileTree, 
     repoData, 
     scanRepository, 
-    fetchCodeContext,
-    setError: setGithubError
+    fetchCodeContext
   } = useGitHub();
 
   // Local state

@@ -79,7 +79,7 @@ export const generateQuestions = async (readme, code, resumeText, questionType) 
     try {
       const errData = await response.json();
       errorMsg = errData.error || response.statusText;
-    } catch (e) {
+    } catch {
       errorMsg = `Server Error: ${response.status}`;
     }
     throw new Error(errorMsg);
@@ -147,7 +147,7 @@ export const evaluateAnswerStreaming = async (question, idealAnswer, userAnswer,
             fullContent += content;
             onChunk(content, fullContent);
           }
-        } catch (e) {
+        } catch {
           // Skip invalid JSON lines
         }
       }
